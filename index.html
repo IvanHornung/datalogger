@@ -5,13 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Datalogger</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-firestore.js"></script>
+    <!-- Include additional Firebase services you may need -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
     <h1></h1>Datalogger</h1>
     <input type="text" id="data-point" placeholder="Enter data point">
     <button onclick="addData()">Add Data Point</button>
-    <div id="graph"></div>
+    <div id="graph"></div>      
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDPQ6ADW4R8oEXKJZO9mtADOE8XiRJP8cA",
+            authDomain: "datalogger-1035e.firebaseapp.com",
+            projectId: "datalogger-1035e",
+            storageBucket: "datalogger-1035e.appspot.com",
+            messagingSenderId: "1016360748550",
+            appId: "1:1016360748550:web:33d076d90cb15b8526a587"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
