@@ -1,21 +1,38 @@
 const db = firebase.firestore();
 
 
-// pushes clash royale win data to firebase db
 // function submitClashRoyaleData() {
 //     const winsInput = document.getElementById('clash-royale-wins');
-//     const wins = parseInt(winsInput.value, 10); // Ensure the input is an integer
-//     if (!isNaN(wins) && wins >= 0 && wins <= 12) { // Check if the input is a number and non-negative
-//         db.collection("ClashRoyale").add({
-//             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-//             wins: wins
-//         })
-//         .then(function(docRef) {
-//             console.log("Clash Royale wins added with ID: ", docRef.id);
+//     const wins = parseInt(winsInput.value, 10);
+//     const clashRoyaleDocRef = db.collection("ClashRoyale").doc("classicChallengeWins");
+
+    
+//     if (!isNaN(wins) && wins >= 0 && wins <= 12) {
+//         db.runTransaction(transaction => {
+//             return transaction.get(clashRoyaleDocRef).then(doc => {
+//                 if (!doc.exists) {
+//                     throw "Document does not exist!";
+//                 }
+                
+//                 // Get the current array data or initialize if not present
+//                 const currentWins = doc.data().wins || [];
+//                 const currentTimestamps = doc.data().timestamps || [];
+                
+//                 // Append the new win and the corresponding timestamp
+//                 currentWins.push(wins);
+//                 currentTimestamps.push(firebase.firestore.FieldValue.serverTimestamp());
+
+//                 // Update the document arrays
+//                 transaction.update(clashRoyaleDocRef, {
+//                     wins: currentWins,
+//                     timestamps: currentTimestamps
+//                 });
+//             });
+//         }).then(() => {
+//             console.log("Clash Royale wins updated successfully!");
 //             winsInput.value = ''; // Clear the input box after submitting
-//         })
-//         .catch(function(error) {
-//             console.error("Error adding Clash Royale wins: ", error);
+//         }).catch(error => {
+//             console.error("Error updating Clash Royale wins: ", error);
 //         });
 //     } else {
 //         alert("Please enter a valid number of wins");
@@ -24,35 +41,34 @@ const db = firebase.firestore();
 function submitClashRoyaleData() {
     const winsInput = document.getElementById('clash-royale-wins');
     const wins = parseInt(winsInput.value, 10);
-    const clashRoyaleDocRef = db.collection("ClashRoyale").doc("classicChallengeWins");
 
-    
     if (!isNaN(wins) && wins >= 0 && wins <= 12) {
+        const clashRoyaleDocRef = db.collection("ClashRoyale").doc("classicChallengeWins");
+
         db.runTransaction(transaction => {
             return transaction.get(clashRoyaleDocRef).then(doc => {
                 if (!doc.exists) {
-                    throw "Document does not exist!";
-                }
-                
-                // Get the current array data or initialize if not present
-                const currentWins = doc.data().wins || [];
-                const currentTimestamps = doc.data().timestamps || [];
-                
-                // Append the new win and the corresponding timestamp
-                currentWins.push(wins);
-                currentTimestamps.push(firebase.firestore.FieldValue.serverTimestamp());
+                    console.log("Document does not exist, creating a new one");
+                    transaction.set(clashRoyaleDocRef, { wins: [wins], timestamps: [firebase.firestore.FieldValue.serverTimestamp()] });
+                } else {
+                    console.log("Document exists, updating arrays");
+                    const currentWins = doc.data().wins || [];
+                    const currentTimestamps = doc.data().timestamps || [];
 
-                // Update the document arrays
-                transaction.update(clashRoyaleDocRef, {
-                    wins: currentWins,
-                    timestamps: currentTimestamps
-                });
+                    currentWins.push(wins);
+                    currentTimestamps.push(firebase.firestore.FieldValue.serverTimestamp());
+
+                    transaction.update(clashRoyaleDocRef, {
+                        wins: currentWins,
+                        timestamps: currentTimestamps
+                    });
+                }
             });
         }).then(() => {
-            console.log("Clash Royale wins updated successfully!");
+            console.log("Transaction successfully committed!");
             winsInput.value = ''; // Clear the input box after submitting
         }).catch(error => {
-            console.error("Error updating Clash Royale wins: ", error);
+            console.error("Transaction failed: ", error);
         });
     } else {
         alert("Please enter a valid number of wins");
