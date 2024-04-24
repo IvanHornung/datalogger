@@ -65,6 +65,7 @@ function setupEventListeners() {
     submitButton.addEventListener('click', submitClashRoyaleData);
 }
 
+
 function plotClassicChallengeWinsData() {
     const clashRoyaleDocRef = db.collection("ClashRoyale").doc("classicChallengeWins");
 
@@ -77,6 +78,8 @@ function plotClassicChallengeWinsData() {
             var scatterTrace = {
                 x: indices,
                 y: winsData,
+                xaxis: 'x1',  // Assign to first x-axis
+                yaxis: 'y1',  // Assign to first y-axis
                 type: 'scatter',
                 mode: 'lines+markers',
                 marker: { color: 'blue' },
@@ -86,6 +89,8 @@ function plotClassicChallengeWinsData() {
             // Create the histogram trace
             var histogramTrace = {
                 x: winsData,
+                xaxis: 'x2',  // Assign to second x-axis
+                yaxis: 'y2',  // Assign to second y-axis
                 type: 'histogram',
                 opacity: 0.75,
                 marker: {
@@ -94,7 +99,7 @@ function plotClassicChallengeWinsData() {
                 name: 'Histogram',
                 xbins: {
                     start: 0,
-                    end: 12,
+                    end: 13,  // Ensure it covers the range including the upper bound
                     size: 1
                 }
             };
@@ -103,15 +108,25 @@ function plotClassicChallengeWinsData() {
 
             var layout = {
                 title: 'Clash Royale Wins Data Analysis',
+                grid: {rows: 1, columns: 2, subplots: [['xy', 'x2y2']]}, // Define the subplots
                 xaxis: {
-                    title: 'Attempt Number'
+                    title: 'Attempt Number',
+                    domain: [0, 0.45]  // Allocate domain for the first plot
                 },
                 yaxis: {
                     title: 'Wins',
                     range: [0, 12]
                 },
-                barmode: 'overlay',
-                grid: {rows: 1, columns: 2, pattern: 'independent'}, // Setting up a grid layout for subplots
+                xaxis2: {
+                    title: 'Wins (Histogram)',
+                    domain: [0.55, 1]  // Allocate domain for the second plot
+                },
+                yaxis2: {
+                    title: 'Count',
+                    overlaying: 'y',  // Optional: Overlay y-axis if needed
+                    anchor: 'x2'
+                },
+                barmode: 'overlay'
             };
 
             Plotly.newPlot('myPlotDiv', data, layout);
@@ -122,7 +137,6 @@ function plotClassicChallengeWinsData() {
         console.error("Error getting document: ", error);
     });
 }
-
 
 
 // Initialize the event listeners when the window loads
