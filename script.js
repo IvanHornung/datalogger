@@ -73,27 +73,48 @@ function plotClassicChallengeWinsData() {
             const winsData = doc.data().wins || [];
             const indices = winsData.map((_, index) => index); // Create an array of indices
 
-            // Create the plot
-            var trace = {
-                x: indices, // Array of indices as the x-axis
-                y: winsData, // Array of wins as the y-axis
+            // Create the scatter plot trace
+            var scatterTrace = {
+                x: indices,
+                y: winsData,
                 type: 'scatter',
                 mode: 'lines+markers',
-                marker: { color: 'blue' }
+                marker: { color: 'blue' },
+                name: 'Line Plot'
             };
 
-            var layout = {
-                title: 'Clash Royale Classic Challenge Wins',
-                xaxis: {
-                    title: 'Attempt Number' // x-axis title
+            // Create the histogram trace
+            var histogramTrace = {
+                x: winsData,
+                type: 'histogram',
+                opacity: 0.75,
+                marker: {
+                    color: 'green',
                 },
-                yaxis: {
-                    title: 'Wins',
-                    range: [0, 12] // y-axis range from 0 to 12
+                name: 'Histogram',
+                xbins: {
+                    start: 0,
+                    end: 12,
+                    size: 1
                 }
             };
 
-            Plotly.newPlot('myPlotDiv', [trace], layout);
+            var data = [scatterTrace, histogramTrace];
+
+            var layout = {
+                title: 'Clash Royale Wins Data Analysis',
+                xaxis: {
+                    title: 'Attempt Number'
+                },
+                yaxis: {
+                    title: 'Wins',
+                    range: [0, 12]
+                },
+                barmode: 'overlay',
+                grid: {rows: 1, columns: 2, pattern: 'independent'}, // Setting up a grid layout for subplots
+            };
+
+            Plotly.newPlot('myPlotDiv', data, layout);
         } else {
             console.log("Document not found");
         }
@@ -101,6 +122,7 @@ function plotClassicChallengeWinsData() {
         console.error("Error getting document: ", error);
     });
 }
+
 
 
 // Initialize the event listeners when the window loads
