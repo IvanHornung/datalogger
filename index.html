@@ -11,17 +11,19 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
-    <h1>Datalogger #647</h1>
+    <h1>Datalogger #1225</h1>
     <!-- <input type="text" id="data-point" placeholder="Enter data point">
     <button onclick="addData()">Add Data Point</button> -->
     <input type="number" id="clash-royale-wins" placeholder="Enter wins">
     <!-- <button onclick="submitClashRoyaleData()">Submit Win</button> -->
-    <button id="submit-button">Submit Wins</button>
+    <button id="submit-button">Submit</button>
 
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <div id="myPlotDiv" style="width:50%;height:350px;"></div>
-    <!-- <div id="myPlotDiv" style="width:600px; height:400px;"></div> The plot will be rendered inside this div -->
-    <div id="histogramDiv" style="width:50%;height:350px;"></div> <!-- Histogram plot -->
+    <div style="display: flex; justify-content: space-around; align-items: center;">
+        <div id="myPlotDiv" style="width: 50%; height: 33%; border: 1px solid black;"></div>
+        <div id="histogramDiv" style="width: 50%; height: 33%; border: 1px solid black;"></div>
+    </div>
+
 
 
     <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>

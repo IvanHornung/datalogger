@@ -1,3 +1,11 @@
+
+// TODO: 
+// - set passkey to input data
+// - do PT section
+// - have statistics for cc wins too
+// - change it so size of graph is a percentage for mobile
+
+
 const db = firebase.firestore();
 
 
@@ -103,6 +111,8 @@ function plotClassicChallengeWinsData() {
 
 }
 
+
+
 function plotHistogramWinsData() {
     const clashRoyaleDocRef = db.collection("ClashRoyale").doc("classicChallengeWins");
 
@@ -133,7 +143,8 @@ function plotHistogramWinsData() {
                     dtick: 1
                 },
                 yaxis: {
-                    title: 'Frequency'
+                    title: 'Frequency',
+                    range: [0, 12]
                 }
             };
 
