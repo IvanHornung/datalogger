@@ -3,25 +3,30 @@ const db = firebase.firestore();
 
 function submitClashRoyaleData() {
     const winsInput = document.getElementById('clash-royale-wins');
-    const wins = parseInt(winsInput.value, 10);
+    const wins = parseInt(winsInput.value, 10); // Ensure the input is an integer
 
+    // Check if the input is a number and non-negative, within the range of 0 to 12
     if (!isNaN(wins) && wins >= 0 && wins <= 12) {
         const clashRoyaleDocRef = db.collection("ClashRoyale").doc("classicChallengeWins");
-        const now = firebase.firestore.Timestamp.fromDate(new Date()); // Client-side timestamp
+
+        // Convert current date and time to a string
+        const nowAsString = new Date().toISOString();
 
         db.runTransaction(transaction => {
             return transaction.get(clashRoyaleDocRef).then(doc => {
                 if (!doc.exists) {
+                    // If the document does not exist, create it with the initial values
                     transaction.set(clashRoyaleDocRef, {
                         wins: [wins],
-                        timestamps: [now]
+                        timestamps: [nowAsString] // Store the string representation of the timestamp
                     });
                 } else {
+                    // If the document exists, append the new win and timestamp string
                     const currentWins = doc.data().wins || [];
                     const currentTimestamps = doc.data().timestamps || [];
-                    
+
                     currentWins.push(wins);
-                    currentTimestamps.push(now); // Add the client-side timestamp
+                    currentTimestamps.push(nowAsString); // Add the string timestamp
 
                     transaction.update(clashRoyaleDocRef, {
                         wins: currentWins,
@@ -39,6 +44,7 @@ function submitClashRoyaleData() {
         alert("Please enter a valid number of wins");
     }
 }
+
 
 
 
