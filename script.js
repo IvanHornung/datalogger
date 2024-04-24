@@ -3,31 +3,31 @@ const db = firebase.firestore();
 
 function submitClashRoyaleData() {
     const winsInput = document.getElementById('clash-royale-wins');
-    const wins = parseInt(winsInput.value, 10); // Ensure the input is an integer
+    const wins = parseInt(winsInput.value, 10);
 
-    // Check if the input is a number and within the expected range
     if (!isNaN(wins) && wins >= 0 && wins <= 12) {
         const clashRoyaleDocRef = db.collection("ClashRoyale").doc("classicChallengeWins");
+        const now = firebase.firestore.Timestamp.fromDate(new Date()); // Client-side timestamp
 
-        // Run a transaction to update the document with the new win
         db.runTransaction(transaction => {
             return transaction.get(clashRoyaleDocRef).then(doc => {
-                // If the document does not exist, create it with the initial values
                 if (!doc.exists) {
-                    return transaction.set(clashRoyaleDocRef, {
+                    transaction.set(clashRoyaleDocRef, {
                         wins: [wins],
-                        timestamps: [firebase.firestore.FieldValue.serverTimestamp()]
+                        timestamps: [now]
+                    });
+                } else {
+                    const currentWins = doc.data().wins || [];
+                    const currentTimestamps = doc.data().timestamps || [];
+                    
+                    currentWins.push(wins);
+                    currentTimestamps.push(now); // Add the client-side timestamp
+
+                    transaction.update(clashRoyaleDocRef, {
+                        wins: currentWins,
+                        timestamps: currentTimestamps
                     });
                 }
-
-                // If the document exists, append the new win and timestamp
-                const newWins = [...doc.data().wins, wins];
-                const newTimestamps = [...doc.data().timestamps, firebase.firestore.FieldValue.serverTimestamp()];
-
-                return transaction.update(clashRoyaleDocRef, {
-                    wins: newWins,
-                    timestamps: newTimestamps
-                });
             });
         }).then(() => {
             console.log("Clash Royale wins updated successfully!");
