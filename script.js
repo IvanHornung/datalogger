@@ -2,25 +2,65 @@ const db = firebase.firestore();
 
 
 // pushes clash royale win data to firebase db
+// function submitClashRoyaleData() {
+//     const winsInput = document.getElementById('clash-royale-wins');
+//     const wins = parseInt(winsInput.value, 10); // Ensure the input is an integer
+//     if (!isNaN(wins) && wins >= 0 && wins <= 12) { // Check if the input is a number and non-negative
+//         db.collection("ClashRoyale").add({
+//             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+//             wins: wins
+//         })
+//         .then(function(docRef) {
+//             console.log("Clash Royale wins added with ID: ", docRef.id);
+//             winsInput.value = ''; // Clear the input box after submitting
+//         })
+//         .catch(function(error) {
+//             console.error("Error adding Clash Royale wins: ", error);
+//         });
+//     } else {
+//         alert("Please enter a valid number of wins");
+//     }
+// }
 function submitClashRoyaleData() {
     const winsInput = document.getElementById('clash-royale-wins');
-    const wins = parseInt(winsInput.value, 10); // Ensure the input is an integer
-    if (!isNaN(wins) && wins >= 0 && wins <= 12) { // Check if the input is a number and non-negative
-        db.collection("ClashRoyale").add({
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            wins: wins
-        })
-        .then(function(docRef) {
-            console.log("Clash Royale wins added with ID: ", docRef.id);
+    const wins = parseInt(winsInput.value, 10);
+    const clashRoyaleDocRef = db.collection("ClashRoyale").doc("classicChallengeWins");
+
+    
+    if (!isNaN(wins) && wins >= 0 && wins <= 12) {
+        db.runTransaction(transaction => {
+            return transaction.get(clashRoyaleDocRef).then(doc => {
+                if (!doc.exists) {
+                    throw "Document does not exist!";
+                }
+                
+                // Get the current array data or initialize if not present
+                const currentWins = doc.data().wins || [];
+                const currentTimestamps = doc.data().timestamps || [];
+                
+                // Append the new win and the corresponding timestamp
+                currentWins.push(wins);
+                currentTimestamps.push(firebase.firestore.FieldValue.serverTimestamp());
+
+                // Update the document arrays
+                transaction.update(clashRoyaleDocRef, {
+                    wins: currentWins,
+                    timestamps: currentTimestamps
+                });
+            });
+        }).then(() => {
+            console.log("Clash Royale wins updated successfully!");
             winsInput.value = ''; // Clear the input box after submitting
-        })
-        .catch(function(error) {
-            console.error("Error adding Clash Royale wins: ", error);
+        }).catch(error => {
+            console.error("Error updating Clash Royale wins: ", error);
         });
     } else {
         alert("Please enter a valid number of wins");
     }
 }
+
+
+
 
 // listens to events and acts according to ID, defined in HTML tag
 // necessary practice in js for multiple listeners
@@ -38,63 +78,47 @@ function setupEventListeners() {
 }
 
 // go through the data and plot
-function getClashRoyaleDataAndPlot() {
-    db.collection("ClashRoyale").orderBy("timestamp")
-        .get()
-        .then(function(querySnapshot) {
-            const timestamps = [];
-            const wins = [];
-            
-            querySnapshot.forEach(function(doc) {
-                // doc.data() is never undefined for query doc snapshots
-                timestamps.push(new Date(doc.data().timestamp.toDate()));
-                wins.push(doc.data().wins);
-            });
-            
-            plotClassicChallengeWinData(timestamps, wins);
-        })
-        .catch(function(error) {
-            console.log("Error getting documents: ", error);
-        });
-}
+function plotClassicChallengeWinsData() {
+    const clashRoyaleDocRef = db.collection("ClashRoyale").doc("classicChallengeWins");
 
-function plotClassicChallengeWinData(timestamps, wins) {
-    var trace = {
-        type: "scatter",  // Use a line plot
-        mode: "lines+markers",  // Line plot with markers at each data point
-        x: timestamps,
-        y: wins,
-        marker: {color: 'blue'}  // Color of the markers
-    };
+    clashRoyaleDocRef.get().then(doc => {
+        if (doc.exists) {
+            const winsData = doc.data().wins || [];
+            const timestampsData = doc.data().timestamps || [];
 
-    var layout = {
-        title: 'Clash Royale Classic Challenge Wins Over Time',
-        xaxis: {
-            title: 'Date and Time',
-            showgrid: false,
-            zeroline: false
-        },
-        yaxis: {
-            title: 'Wins',
-            showline: false
+            // Create the plot
+            var trace = {
+                x: timestampsData.map((_, index) => index), // Array of indices
+                y: winsData, // Array of wins
+                type: 'scatter',
+                mode: 'lines+markers',
+                marker: { color: 'blue' }
+            };
+
+            var layout = {
+                title: 'Clash Royale Classic Challenge Wins',
+                xaxis: {
+                    title: 'Index' // No units, just the index
+                },
+                yaxis: {
+                    title: 'Wins',
+                    range: [0, 12] // Setting the range from 0 to 12
+                }
+            };
+
+            Plotly.newPlot('myPlotDiv', [trace], layout);
+        } else {
+            console.log("No such document!");
         }
-    };
-
-    var data = [trace];
-
-    Plotly.newPlot('myDiv', data, layout);  // Assuming you have a <div> with id='myDiv' for the plot
+    }).catch(error => {
+        console.error("Error getting document: ", error);
+    });
 }
-
-
-
-
-
-
 
 
 // Initialize the event listeners when the window loads
 // you need to set up event listeners and render the plot when loading the page
 window.onload = function() {
     setupEventListeners();
-    getClashRoyaleDataAndPlot(); // Load existing data and plot it initially
+    plotClassicChallengeWinsData(); // Load existing data and plot it initially
 };
