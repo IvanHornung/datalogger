@@ -23,10 +23,11 @@
 
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <div style="display: flex; justify-content: space-around; align-items: center;">
-        <div id="myPlotDiv" style="width: 25%; height:200px; border: 2px solid black; box-sizing: border-box;"></div>
-        <div id="histogramDiv" style="width: 25%; height: 200px; border: 2px solid black; box-sizing: border-box;"></div>
+        <div id="myPlotDiv" style="width: 48%; height: 200px; border: 2px solid black; box-sizing: border-box;"></div>
+        <div id="histogramDiv" style="width: 48%; height: 200px; border: 2px solid black; box-sizing: border-box;"></div>
     </div>
     
+    <!-- Lists and stats container -->
     <div class="container">
         <!-- Scrollable list container -->
         <div class="scrollable-list" id="winsList">
@@ -38,9 +39,7 @@
             <p>Statistics will be displayed here.</p>
         </div>
     </div>
-    <div id="winsList" style="height: 200px; overflow: auto; border: 1px solid #000; margin: 10px 0;">
-        <!-- List of wins will be dynamically inserted here -->
-    </div>
+
     
     <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-firestore.js"></script>
@@ -66,7 +65,7 @@
 
         clashRoyaleDocRef.get().then(doc => {
             if (doc.exists) {
-                const winsData = doc.data().wins || [];
+                var winsData = doc.data().wins || [];
                 winsData = winsData.reverse();
                 winsData.forEach(win => {
                     const winItem = document.createElement('div');

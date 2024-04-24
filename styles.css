@@ -3,28 +3,21 @@ body {
     background: #D8DFB7;
     text-align: center;
 }
-.container {
+container {
     display: flex;
-    width: 100%;
+    justify-content: space-between; /* Adjust this to change the spacing between the boxes */
 }
-/* Scrollable list of wins */
+
+/* Styling for the scrollable list and statistics box */
+.scrollable-list, .statistics-box {
+    width: 50%; /* Adjust width if needed */
+    border: 2px solid black;
+    box-sizing: border-box;
+    margin: 10px; /* Adjust margin if needed */
+}
+
+/* Styling for the scrollable list to make it actually scrollable */
 .scrollable-list {
-    width: 33.33%;
-    height: 200px; /* or however tall you want it */
-    overflow: auto;
-    border: 1px solid #000;
-    order: 1; /* position first in flexbox */
-}
-/* Plots container */
-.plots-container {
-    width: 33.33%;
-    order: 2; /* position second in flexbox */
-}
-/* Statistics box */
-.statistics-box {
-    width: 33.33%;
-    height: 200px; /* matching height of the list */
-    border: 1px solid #000;
-    padding: 10px;
-    order: 3; /* position third in flexbox */
+    height: 400px; /* Adjust height if needed */
+    overflow-y: auto;
 }
