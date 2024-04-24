@@ -65,7 +65,6 @@ function setupEventListeners() {
     submitButton.addEventListener('click', submitClashRoyaleData);
 }
 
-
 function plotClassicChallengeWinsData() {
     const clashRoyaleDocRef = db.collection("ClashRoyale").doc("classicChallengeWins");
 
@@ -74,69 +73,82 @@ function plotClassicChallengeWinsData() {
             const winsData = doc.data().wins || [];
             const indices = winsData.map((_, index) => index); // Create an array of indices
 
-            // Create the scatter plot trace
-            var scatterTrace = {
-                x: indices,
-                y: winsData,
-                xaxis: 'x1',  // Assign to first x-axis
-                yaxis: 'y1',  // Assign to first y-axis
+            // Create the plot
+            var trace = {
+                x: indices, // Array of indices as the x-axis
+                y: winsData, // Array of wins as the y-axis
                 type: 'scatter',
                 mode: 'lines+markers',
-                marker: { color: 'blue' },
-                name: 'Line Plot'
+                marker: { color: 'blue' }
             };
-
-            // Create the histogram trace
-            var histogramTrace = {
-                x: winsData,
-                xaxis: 'x2',  // Assign to second x-axis
-                yaxis: 'y2',  // Assign to second y-axis
-                type: 'histogram',
-                opacity: 0.75,
-                marker: {
-                    color: 'green',
-                },
-                name: 'Histogram',
-                xbins: {
-                    start: 0,
-                    end: 13,  // Ensure it covers the range including the upper bound
-                    size: 1
-                }
-            };
-
-            var data = [scatterTrace, histogramTrace];
 
             var layout = {
-                title: 'Clash Royale Wins Data Analysis',
-                grid: {rows: 1, columns: 2, subplots: [['xy', 'x2y2']]}, // Define the subplots
+                title: 'Clash Royale Classic Challenge Wins',
                 xaxis: {
-                    title: 'Attempt Number',
-                    domain: [0, 0.45]  // Allocate domain for the first plot
+                    title: 'Attempt Number' // x-axis title
                 },
                 yaxis: {
                     title: 'Wins',
-                    range: [0, 12]
-                },
-                xaxis2: {
-                    title: 'Wins (Histogram)',
-                    domain: [0.55, 1]  // Allocate domain for the second plot
-                },
-                yaxis2: {
-                    title: 'Count',
-                    overlaying: 'y',  // Optional: Overlay y-axis if needed
-                    anchor: 'x2'
-                },
-                barmode: 'overlay'
+                    range: [0, 12] // y-axis range from 0 to 12
+                }
             };
 
-            Plotly.newPlot('myPlotDiv', data, layout);
+            Plotly.newPlot('myPlotDiv', [trace], layout);
         } else {
             console.log("Document not found");
         }
     }).catch(error => {
         console.error("Error getting document: ", error);
     });
+
 }
+
+function plotHistogramWinsData() {
+    const clashRoyaleDocRef = db.collection("ClashRoyale").doc("classicChallengeWins");
+
+    clashRoyaleDocRef.get().then(doc => {
+        if (doc.exists) {
+            const winsData = doc.data().wins || [];
+
+            // Create the histogram plot trace
+            var histogramTrace = {
+                x: winsData,
+                type: 'histogram',
+                opacity: 0.75,
+                marker: {
+                    color: 'green',
+                },
+                xbins: {
+                    start: 0,
+                    end: 12,  // Ensure the range includes the upper bound
+                    size: 1  // Each bin represents each possible win count
+                }
+            };
+
+            var layout = {
+                title: 'Histogram of Wins',
+                xaxis: {
+                    title: 'Number of Wins',
+                    tick0: 0,
+                    dtick: 1
+                },
+                yaxis: {
+                    title: 'Frequency'
+                }
+            };
+
+            Plotly.newPlot('histogramDiv', [histogramTrace], layout);
+        } else {
+            console.log("Document not found");
+        }
+    }).catch(error => {
+        console.error("Error getting document for histogram: ", error);
+    });
+}
+
+
+
+
 
 
 // Initialize the event listeners when the window loads
@@ -144,4 +156,5 @@ function plotClassicChallengeWinsData() {
 window.onload = function() {
     setupEventListeners();
     plotClassicChallengeWinsData(); // Load existing data and plot it initially
+    plotHistogramWinsData();
 };

@@ -3,9 +3,3 @@ body {
     background: lightblue;
     text-align: center;
 }
-
-
-#myPlotDiv {
-    width: 100%;
-    height: 500px;
-}
