@@ -1,79 +1,45 @@
 const db = firebase.firestore();
 
 
-// function submitClashRoyaleData() {
-//     const winsInput = document.getElementById('clash-royale-wins');
-//     const wins = parseInt(winsInput.value, 10);
-//     const clashRoyaleDocRef = db.collection("ClashRoyale").doc("classicChallengeWins");
-
-    
-//     if (!isNaN(wins) && wins >= 0 && wins <= 12) {
-//         db.runTransaction(transaction => {
-//             return transaction.get(clashRoyaleDocRef).then(doc => {
-//                 if (!doc.exists) {
-//                     throw "Document does not exist!";
-//                 }
-                
-//                 // Get the current array data or initialize if not present
-//                 const currentWins = doc.data().wins || [];
-//                 const currentTimestamps = doc.data().timestamps || [];
-                
-//                 // Append the new win and the corresponding timestamp
-//                 currentWins.push(wins);
-//                 currentTimestamps.push(firebase.firestore.FieldValue.serverTimestamp());
-
-//                 // Update the document arrays
-//                 transaction.update(clashRoyaleDocRef, {
-//                     wins: currentWins,
-//                     timestamps: currentTimestamps
-//                 });
-//             });
-//         }).then(() => {
-//             console.log("Clash Royale wins updated successfully!");
-//             winsInput.value = ''; // Clear the input box after submitting
-//         }).catch(error => {
-//             console.error("Error updating Clash Royale wins: ", error);
-//         });
-//     } else {
-//         alert("Please enter a valid number of wins");
-//     }
-// }
 function submitClashRoyaleData() {
     const winsInput = document.getElementById('clash-royale-wins');
-    const wins = parseInt(winsInput.value, 10);
+    const wins = parseInt(winsInput.value, 10); // Ensure the input is an integer
 
+    // Check if the input is a number and within the expected range
     if (!isNaN(wins) && wins >= 0 && wins <= 12) {
         const clashRoyaleDocRef = db.collection("ClashRoyale").doc("classicChallengeWins");
 
+        // Run a transaction to update the document with the new win
         db.runTransaction(transaction => {
             return transaction.get(clashRoyaleDocRef).then(doc => {
+                // If the document does not exist, create it with the initial values
                 if (!doc.exists) {
-                    console.log("Document does not exist, creating a new one");
-                    transaction.set(clashRoyaleDocRef, { wins: [wins], timestamps: [firebase.firestore.FieldValue.serverTimestamp()] });
-                } else {
-                    console.log("Document exists, updating arrays");
-                    const currentWins = doc.data().wins || [];
-                    const currentTimestamps = doc.data().timestamps || [];
-
-                    currentWins.push(wins);
-                    currentTimestamps.push(firebase.firestore.FieldValue.serverTimestamp());
-
-                    transaction.update(clashRoyaleDocRef, {
-                        wins: currentWins,
-                        timestamps: currentTimestamps
+                    return transaction.set(clashRoyaleDocRef, {
+                        wins: [wins],
+                        timestamps: [firebase.firestore.FieldValue.serverTimestamp()]
                     });
                 }
+
+                // If the document exists, append the new win and timestamp
+                const newWins = [...doc.data().wins, wins];
+                const newTimestamps = [...doc.data().timestamps, firebase.firestore.FieldValue.serverTimestamp()];
+
+                return transaction.update(clashRoyaleDocRef, {
+                    wins: newWins,
+                    timestamps: newTimestamps
+                });
             });
         }).then(() => {
-            console.log("Transaction successfully committed!");
+            console.log("Clash Royale wins updated successfully!");
             winsInput.value = ''; // Clear the input box after submitting
         }).catch(error => {
-            console.error("Transaction failed: ", error);
+            console.error("Error updating Clash Royale wins: ", error);
         });
     } else {
         alert("Please enter a valid number of wins");
     }
 }
+
 
 
 
@@ -93,19 +59,18 @@ function setupEventListeners() {
     submitButton.addEventListener('click', submitClashRoyaleData);
 }
 
-// go through the data and plot
 function plotClassicChallengeWinsData() {
     const clashRoyaleDocRef = db.collection("ClashRoyale").doc("classicChallengeWins");
 
     clashRoyaleDocRef.get().then(doc => {
         if (doc.exists) {
             const winsData = doc.data().wins || [];
-            const timestampsData = doc.data().timestamps || [];
+            const indices = winsData.map((_, index) => index); // Create an array of indices
 
             // Create the plot
             var trace = {
-                x: timestampsData.map((_, index) => index), // Array of indices
-                y: winsData, // Array of wins
+                x: indices, // Array of indices as the x-axis
+                y: winsData, // Array of wins as the y-axis
                 type: 'scatter',
                 mode: 'lines+markers',
                 marker: { color: 'blue' }
@@ -114,17 +79,17 @@ function plotClassicChallengeWinsData() {
             var layout = {
                 title: 'Clash Royale Classic Challenge Wins',
                 xaxis: {
-                    title: 'Index' // No units, just the index
+                    title: 'Attempt Number' // x-axis title
                 },
                 yaxis: {
                     title: 'Wins',
-                    range: [0, 12] // Setting the range from 0 to 12
+                    range: [0, 12] // y-axis range from 0 to 12
                 }
             };
 
             Plotly.newPlot('myPlotDiv', [trace], layout);
         } else {
-            console.log("No such document!");
+            console.log("Document not found");
         }
     }).catch(error => {
         console.error("Error getting document: ", error);
