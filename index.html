@@ -11,7 +11,7 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
-    <h1>Datalogger #1225</h1>
+    <h1>Datalogger #1233</h1>
     <!-- <input type="text" id="data-point" placeholder="Enter data point">
     <button onclick="addData()">Add Data Point</button> -->
     <input type="number" id="clash-royale-wins" placeholder="Enter wins">
@@ -20,16 +20,18 @@
 
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <div style="display: flex; justify-content: space-around; align-items: center;">
-        <div id="myPlotDiv" style="width: 50%; height: 33%; border: 1px solid black;"></div>
-        <div id="histogramDiv" style="width: 50%; height: 33%; border: 1px solid black;"></div>
+        <div id="myPlotDiv" style="width: 50%; height:300px; border: 2px solid black; box-sizing: border-box;"></div>
+        <div id="histogramDiv" style="width: 50%; height: 300px; border: 2px solid black; box-sizing: border-box;"></div>
     </div>
 
-
+    <div id="winsList" style="height: 200px; overflow: auto; border: 1px solid #000; margin: 10px 0;">
+        <!-- List of wins will be dynamically inserted here -->
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-firestore.js"></script>
     <script>
-        // Your web app's Firebase configuration
+        // Your web app's Firebase configuration    
         const firebaseConfig = {
             apiKey: "AIzaSyDPQ6ADW4R8oEXKJZO9mtADOE8XiRJP8cA",
             authDomain: "datalogger-1035e.firebaseapp.com",
@@ -41,6 +43,29 @@
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
+
+
+        const winsListDiv = document.getElementById('winsList');
+        
+        // Reference to your Firestore collection
+        const clashRoyaleDocRef = firebase.firestore().collection("ClashRoyale").doc("classicChallengeWins");
+
+        clashRoyaleDocRef.get().then(doc => {
+            if (doc.exists) {
+                const winsData = doc.data().wins || [];
+                winsData.forEach(win => {
+                    const winItem = document.createElement('div');
+                    winItem.textContent = `Win: ${win}`;
+                    winItem.style.padding = '5px';
+                    winItem.style.borderBottom = '1px solid #ddd'; // Add styling as needed
+                    winsListDiv.appendChild(winItem);
+                });
+            } else {
+                winsListDiv.textContent = "No wins data found.";
+            }
+        }).catch(error => {
+            console.error("Error fetching wins: ", error);
+        });
     </script>
     <script src="script.js"></script>
 </body>

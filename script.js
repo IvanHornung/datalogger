@@ -7,10 +7,19 @@
 
 
 const db = firebase.firestore();
+var locked = true;
 
 
 function submitClashRoyaleData() {
     const winsInput = document.getElementById('clash-royale-wins');
+    if (locked && winsInput.value !== "crobro") {
+        console.log("Incorrect Passkey. Access not granted");
+        return;
+    } else if (winsInput.value === "crobro" && locked) {
+        locked = false;
+        console.log("Access granted")
+    }
+
     const wins = parseInt(winsInput.value, 10); // Ensure the input is an integer
 
     // Check if the input is a number and non-negative, within the range of 0 to 12
@@ -93,11 +102,11 @@ function plotClassicChallengeWinsData() {
             var layout = {
                 title: 'Clash Royale Classic Challenge Wins',
                 xaxis: {
-                    title: 'Attempt Number' // x-axis title
+                    title: 'Attempt Number', // x-axis title
+                    range: [0,12]
                 },
                 yaxis: {
                     title: 'Wins',
-                    range: [0, 12] // y-axis range from 0 to 12
                 }
             };
 
