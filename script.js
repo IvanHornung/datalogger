@@ -1,9 +1,7 @@
 
 // TODO: 
-// - set passkey to input data
 // - do PT section
 // - have statistics for cc wins too
-// - change it so size of graph is a percentage for mobile
 
 
 const db = firebase.firestore();
@@ -18,6 +16,7 @@ function submitClashRoyaleData() {
     } else if (winsInput.value === "crobro" && locked) {
         locked = false;
         console.log("Access granted")
+        return;
     }
 
     const wins = parseInt(winsInput.value, 10); // Ensure the input is an integer
