@@ -11,7 +11,7 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>  
-    <h1>Datalogger #754</h1>
+    <h1>Datalogger #819</h1>
       
     
     <input type="text" id="clash-royale-wins" placeholder="Enter wins">
@@ -33,7 +33,6 @@
         <!-- Statistics box container -->
         <div class="statistics-box" id="statsBox">
             <!-- Statistics calculations will be coded here -->
-            <p>Statistics will be displayed here.</p>
         </div>
     </div>
 
@@ -56,6 +55,8 @@
 
 
         const winsListDiv = document.getElementById('winsList');
+        const statsBoxDiv = document.getElementById('statsBox');
+
         
         // Reference to your Firestore collection
         const clashRoyaleDocRef = firebase.firestore().collection("ClashRoyale").doc("classicChallengeWins");
