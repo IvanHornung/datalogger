@@ -41,7 +41,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-firestore.js"></script>
     <script>
-        // Existing Firebase and Firestore configuration
+        // Your web app's Firebase configuration    
         const firebaseConfig = {
             apiKey: "AIzaSyDPQ6ADW4R8oEXKJZO9mtADOE8XiRJP8cA",
             authDomain: "datalogger-1035e.firebaseapp.com",
@@ -50,46 +50,39 @@
             messagingSenderId: "1016360748550",
             appId: "1:1016360748550:web:33d076d90cb15b8526a587"
         };
-    
-        // Ensure Firebase is initialized only once
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        } else {
-            firebase.app(); // if already initialized, use that one
-        }
-    
-        const db = firebase.firestore();
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+
         const winsListDiv = document.getElementById('winsList');
-        const statsBoxDiv = document.getElementById('statsBox');
-    
-        // Existing data fetching logic for individual document
+        
+        // Reference to your Firestore collection
         const clashRoyaleDocRef = firebase.firestore().collection("ClashRoyale").doc("classicChallengeWins");
+
         clashRoyaleDocRef.get().then(doc => {
             if (doc.exists) {
-                const winsData = doc.data().wins || [];
-                displayWins(winsData.reverse());
+                var winsData = doc.data().wins || [];
+                winsData = winsData.reverse();
+                winsData.forEach(win => {
+                    const winItem = document.createElement('div');
+                    winItem.textContent = `Win: ${win}`;
+                    winItem.style.padding = '5px';
+                    winItem.style.borderBottom = '1px solid #ddd'; // Add styling as needed
+                    winsListDiv.appendChild(winItem);
+                });
                 const stats = calculateStatistics(winsData);
                 displayStatistics(stats);
             } else {
                 winsListDiv.textContent = "No wins data found.";
-                statsBoxDiv.textContent = "No statistics available.";
             }
         }).catch(error => {
             console.error("Error fetching wins: ", error);
-            winsListDiv.textContent = "Failed to fetch wins data.";
-            statsBoxDiv.textContent = "Failed to fetch statistics.";
         });
-    
-        function displayWins(winsData) {
-            winsData.forEach(win => {
-                const winItem = document.createElement('div');
-                winItem.textContent = `${win}`;
-                winItem.style.padding = '5px';
-                winItem.style.borderBottom = '1px solid #ddd';
-                winsListDiv.appendChild(winItem);
-            });
-        }
-    
+
+
+
+
         function calculateStatistics(data) {
             const sum = data.reduce((a, b) => a + b, 0);
             const count = data.length;
@@ -98,7 +91,7 @@
             const stddev = Math.sqrt(variance);
             return { mean, stddev, count, sum };
         }
-    
+
         function displayStatistics(stats) {
             statsBoxDiv.innerHTML = `<p>Mean: ${stats.mean.toFixed(2)}</p>
                                      <p>Standard Deviation: ${stats.stddev.toFixed(2)}</p>
