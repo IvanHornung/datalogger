@@ -11,7 +11,7 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>  
-    <h1>Datalogger #819</h1>
+    <h1>Datalogger #827/h1>
       
     
     <input type="text" id="clash-royale-wins" placeholder="Enter wins">
@@ -67,7 +67,7 @@
                 winsData = winsData.reverse();
                 winsData.forEach(win => {
                     const winItem = document.createElement('div');
-                    winItem.textContent = `Win: ${win}`;
+                    winItem.textContent = `${win}`;
                     winItem.style.padding = '5px';
                     winItem.style.borderBottom = '1px solid #ddd'; // Add styling as needed
                     winsListDiv.appendChild(winItem);

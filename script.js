@@ -99,7 +99,7 @@ function plotClassicChallengeWinsData() {
             };
 
             var layout = {
-                title: 'Clash Royale Classic Challenge Wins',
+                title: 'Classic Challenge Wins',
                 xaxis: {
                     title: 'Attempt Number' // x-axis title
                 },
