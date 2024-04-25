@@ -101,11 +101,11 @@ function plotClassicChallengeWinsData() {
             var layout = {
                 title: 'Clash Royale Classic Challenge Wins',
                 xaxis: {
-                    title: 'Attempt Number', // x-axis title
-                    range: [0,12]
+                    title: 'Attempt Number' // x-axis title
                 },
                 yaxis: {
                     title: 'Wins',
+                    range: [0,12]
                 }
             };
 
@@ -148,11 +148,11 @@ function plotHistogramWinsData() {
                 xaxis: {
                     title: 'Number of Wins',
                     tick0: 0,
-                    dtick: 1
+                    dtick: 1,
+                    range: [0,12]
                 },
                 yaxis: {
-                    title: 'Frequency',
-                    range: [0, 12]
+                    title: 'Frequency'
                 }
             };
 
