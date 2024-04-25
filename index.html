@@ -11,7 +11,7 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>  
-    <h1>Datalogger #111</h1>
+    <h1>Datalogger #754</h1>
       
     
     <input type="text" id="clash-royale-wins" placeholder="Enter wins">
@@ -20,8 +20,8 @@
 
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <div style="display: flex; justify-content: space-around; align-items: center;">
-        <div id="myPlotDiv" style="width: 48%; height: 200px; border: 2px solid black; box-sizing: border-box;"></div>
-        <div id="histogramDiv" style="width: 48%; height: 200px; border: 2px solid black; box-sizing: border-box;"></div>
+        <div id="myPlotDiv" style="width: 48%; height: 400px; border: 2px solid black; box-sizing: border-box;"></div>
+        <div id="histogramDiv" style="width: 48%; height: 400px; border: 2px solid black; box-sizing: border-box;"></div>
     </div>
     
     <!-- Lists and stats container -->
@@ -41,7 +41,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.0.0/firebase-firestore.js"></script>
     <script>
-        // Your web app's Firebase configuration    
+        // Existing Firebase and Firestore configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDPQ6ADW4R8oEXKJZO9mtADOE8XiRJP8cA",
             authDomain: "datalogger-1035e.firebaseapp.com",
@@ -50,34 +50,63 @@
             messagingSenderId: "1016360748550",
             appId: "1:1016360748550:web:33d076d90cb15b8526a587"
         };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-
-
+    
+        // Ensure Firebase is initialized only once
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        } else {
+            firebase.app(); // if already initialized, use that one
+        }
+    
+        const db = firebase.firestore();
         const winsListDiv = document.getElementById('winsList');
-        
-        // Reference to your Firestore collection
+        const statsBoxDiv = document.getElementById('statsBox');
+    
+        // Existing data fetching logic for individual document
         const clashRoyaleDocRef = firebase.firestore().collection("ClashRoyale").doc("classicChallengeWins");
-
         clashRoyaleDocRef.get().then(doc => {
             if (doc.exists) {
-                var winsData = doc.data().wins || [];
-                winsData = winsData.reverse();
-                winsData.forEach(win => {
-                    const winItem = document.createElement('div');
-                    winItem.textContent = `Win: ${win}`;
-                    winItem.style.padding = '5px';
-                    winItem.style.borderBottom = '1px solid #ddd'; // Add styling as needed
-                    winsListDiv.appendChild(winItem);
-                });
+                const winsData = doc.data().wins || [];
+                displayWins(winsData.reverse());
+                const stats = calculateStatistics(winsData);
+                displayStatistics(stats);
             } else {
                 winsListDiv.textContent = "No wins data found.";
+                statsBoxDiv.textContent = "No statistics available.";
             }
         }).catch(error => {
             console.error("Error fetching wins: ", error);
+            winsListDiv.textContent = "Failed to fetch wins data.";
+            statsBoxDiv.textContent = "Failed to fetch statistics.";
         });
+    
+        function displayWins(winsData) {
+            winsData.forEach(win => {
+                const winItem = document.createElement('div');
+                winItem.textContent = `${win}`;
+                winItem.style.padding = '5px';
+                winItem.style.borderBottom = '1px solid #ddd';
+                winsListDiv.appendChild(winItem);
+            });
+        }
+    
+        function calculateStatistics(data) {
+            const sum = data.reduce((a, b) => a + b, 0);
+            const count = data.length;
+            const mean = sum / count;
+            const variance = data.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / count;
+            const stddev = Math.sqrt(variance);
+            return { mean, stddev, count, sum };
+        }
+    
+        function displayStatistics(stats) {
+            statsBoxDiv.innerHTML = `<p>Mean: ${stats.mean.toFixed(2)}</p>
+                                     <p>Standard Deviation: ${stats.stddev.toFixed(2)}</p>
+                                     <p>Count: ${stats.count}</p>
+                                     <p>Sum: ${stats.sum}</p>`;
+        }
     </script>
+    
     <script src="script.js"></script>
 </body>
 </html>
